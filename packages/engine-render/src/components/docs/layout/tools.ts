@@ -52,6 +52,7 @@ import type {
     IDocumentSkeletonGlyph,
     IDocumentSkeletonLine,
     IDocumentSkeletonPage,
+    IDocumentSkeletonSection,
     ISkeletonResourceReference,
 } from '../../../basics/i-document-skeleton-cached';
 import { GlyphType } from '../../../basics/i-document-skeleton-cached';
@@ -63,6 +64,7 @@ import type { Hyphen } from './hyphenation/hyphen';
 import type { LanguageDetector } from './hyphenation/language-detector';
 import { getCustomDecorationStyle } from './style/custom-decoration';
 import { getCustomRangeStyle } from './style/custom-range';
+import { updateInlineDrawingPosition } from './block/paragraph/layout-ruler';
 
 export function getLastPage(pages: IDocumentSkeletonPage[]) {
     return pages[pages.length - 1];
@@ -436,7 +438,28 @@ export function updateBlockIndex(pages: IDocumentSkeletonPage[], start: number =
     }
 }
 
-export function spanIterator(pages: IDocumentSkeletonPage[], iteratorFunction: (glyph: IDocumentSkeletonGlyph) => void) {
+export function updateInlineDrawingCoords(ctx: ILayoutContext, pages: IDocumentSkeletonPage[]) {
+    lineIterator(pages, (line) => {
+        const affectInlineDrawings = ctx.paragraphConfigCache.get(line.paragraphIndex)?.paragraphInlineSkeDrawings;
+        const drawingAnchor = ctx.skeletonResourceReference?.drawingAnchor?.get(line.paragraphIndex);
+        // Update inline drawings after the line is layout.
+        if (affectInlineDrawings && affectInlineDrawings.size > 0) {
+            updateInlineDrawingPosition(line, affectInlineDrawings, drawingAnchor?.top);
+        }
+    });
+}
+
+export function glyphIterator(
+    pages: IDocumentSkeletonPage[],
+    cb: (
+        glyph: IDocumentSkeletonGlyph,
+        divide: IDocumentSkeletonDivide,
+        line: IDocumentSkeletonLine,
+        column: IDocumentSkeletonColumn,
+        section: IDocumentSkeletonSection,
+        page: IDocumentSkeletonPage
+    ) => void
+) {
     for (const page of pages) {
         const { sections } = page;
 
@@ -447,15 +470,15 @@ export function spanIterator(pages: IDocumentSkeletonPage[], iteratorFunction: (
                 const { lines } = column;
 
                 for (const line of lines) {
-                    const { divides, lineHeight } = line;
+                    const { divides } = line;
                     const divideLength = divides.length;
                     for (let i = 0; i < divideLength; i++) {
                         const divide = divides[i];
                         const { glyphGroup } = divide;
 
                         for (const glyph of glyphGroup) {
-                            if (iteratorFunction && isFunction(iteratorFunction)) {
-                                iteratorFunction(glyph);
+                            if (cb && isFunction(cb)) {
+                                cb(glyph, divide, line, column, section, page);
                             }
                         }
                     }
@@ -465,7 +488,14 @@ export function spanIterator(pages: IDocumentSkeletonPage[], iteratorFunction: (
     }
 }
 
-export function lineIterator(pages: IDocumentSkeletonPage[], iteratorFunction: (line: IDocumentSkeletonLine) => void) {
+export function lineIterator(
+    pages: IDocumentSkeletonPage[],
+    cb: (
+        line: IDocumentSkeletonLine,
+        column: IDocumentSkeletonColumn,
+        section: IDocumentSkeletonSection,
+        page: IDocumentSkeletonPage
+    ) => void) {
     for (const page of pages) {
         const { sections } = page;
 
@@ -476,8 +506,8 @@ export function lineIterator(pages: IDocumentSkeletonPage[], iteratorFunction: (
                 const { lines } = column;
 
                 for (const line of lines) {
-                    if (iteratorFunction && isFunction(iteratorFunction)) {
-                        iteratorFunction(line);
+                    if (cb && isFunction(cb)) {
+                        cb(line, column, section, page);
                     }
                 }
             }
