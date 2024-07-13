@@ -14,20 +14,29 @@
  * limitations under the License.
  */
 
-import './adaptors';
-
-import type { IPageElement } from '@univerjs/core';
+import type { IPageElement, PageElementType } from '@univerjs/core';
 import { sortRules } from '@univerjs/core';
-import type { BaseObject, Scene } from '@univerjs/engine-render';
+import { type BaseObject, type Scene, SlideCanvasObjectProviderRegistry } from '@univerjs/engine-render';
 import { Inject, Injector } from '@wendellhu/redi';
 
-import type { ObjectAdaptor } from './adaptor';
-import { CanvasObjectProviderRegistry } from './adaptor';
+export interface IObjectAdaptor {
+    zIndex: number;
 
-export class ObjectProvider {
-    private _adaptors: ObjectAdaptor[] = [];
+    viewKey: PageElementType | null;
 
-    constructor(@Inject(Injector) private readonly _injector: Injector) {
+    check(type: PageElementType): IObjectAdaptor | undefined;
+
+    convert(pageElement: IPageElement, mainScene: Scene): void;
+
+    create(injector: Injector): void;
+}
+
+export class ObjectProviderService {
+    private _adaptors: IObjectAdaptor[] = [];
+
+    constructor(
+        @Inject(Injector) private readonly _injector: Injector
+    ) {
         this._adaptorLoader();
     }
 
@@ -56,10 +65,10 @@ export class ObjectProvider {
     }
 
     private _adaptorLoader() {
-        CanvasObjectProviderRegistry.getData()
+        SlideCanvasObjectProviderRegistry.getData()
             .sort(sortRules)
-            .forEach((adaptorFactory: ObjectAdaptor) => {
-                this._adaptors.push(adaptorFactory.create(this._injector) as unknown as ObjectAdaptor);
+            .forEach((adaptorFactory: IObjectAdaptor) => {
+                this._adaptors.push(adaptorFactory as unknown as IObjectAdaptor);
             });
     }
 }

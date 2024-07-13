@@ -15,25 +15,31 @@
  */
 
 import type { IPageElement } from '@univerjs/core';
-import { PageElementType } from '@univerjs/core';
-import { Image } from '@univerjs/engine-render';
-import type { Injector } from '@wendellhu/redi';
+import { Disposable, LocaleService, PageElementType } from '@univerjs/core';
+import type { IRichTextProps, Scene } from '@univerjs/engine-render';
+import { RichText } from '@univerjs/engine-render';
+import type { IDisposable } from '@wendellhu/redi';
+import { Inject } from '@wendellhu/redi';
 
-import { CanvasObjectProviderRegistry, ObjectAdaptor } from '../adaptor';
+export class RichTextAdaptor extends Disposable implements IDisposable {
+    zIndex = 0;
 
-export class ImageAdaptor extends ObjectAdaptor {
-    override zIndex = 1;
+    viewKey = PageElementType.TEXT;
 
-    override viewKey = PageElementType.IMAGE;
+    constructor(
+        @Inject(LocaleService) private readonly _localeService: LocaleService
+    ) {
+        super();
+    }
 
-    override check(type: PageElementType) {
+    check(type: PageElementType) {
         if (type !== this.viewKey) {
             return;
         }
         return this;
     }
 
-    override convert(pageElement: IPageElement) {
+    convert(pageElement: IPageElement, mainScene: Scene) {
         const {
             id,
             zIndex,
@@ -50,14 +56,10 @@ export class ImageAdaptor extends ObjectAdaptor {
             flipY,
             title,
             description,
-            image = {},
+            richText = {},
         } = pageElement;
-        const { imageProperties, placeholder, link } = image;
-
-        const contentUrl = imageProperties?.contentUrl || '';
-
-        return new Image(id, {
-            url: contentUrl,
+        const { text, ff, fs, it, bl, ul, st, ol, bg, bd, cl, rich } = richText;
+        let config: IRichTextProps = {
             top,
             left,
             width,
@@ -71,17 +73,19 @@ export class ImageAdaptor extends ObjectAdaptor {
             flipX,
             flipY,
             forceRender: true,
-        });
+        };
+        let isNotNull = false;
+        if (text != null) {
+            config = { ...config, text, ff, fs, it, bl, ul, st, ol, bg, bd, cl };
+            isNotNull = true;
+        } else if (rich != null) {
+            config = { ...config, richText: rich };
+            isNotNull = true;
+        }
+
+        if (isNotNull === false) {
+            return;
+        }
+        return new RichText(this._localeService, id, config);
     }
 }
-
-export class ImageAdaptorFactory {
-    readonly zIndex = 4;
-
-    create(injector: Injector): ImageAdaptor {
-        const imageAdaptor = injector.createInstance(ImageAdaptor);
-        return imageAdaptor;
-    }
-}
-
-CanvasObjectProviderRegistry.add(new ImageAdaptorFactory());

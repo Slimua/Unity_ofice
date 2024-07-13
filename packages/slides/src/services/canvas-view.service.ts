@@ -15,7 +15,7 @@
  */
 
 import type { EventState, IColorStyle, ISlidePage, Nullable, SlideDataModel } from '@univerjs/core';
-import { debounce, getColorStyle, IUniverInstanceService, LifecycleStages, OnLifecycle, RxDisposable, UniverInstanceType } from '@univerjs/core';
+import { debounce, Disposable, getColorStyle, IUniverInstanceService, UniverInstanceType } from '@univerjs/core';
 import type { IWheelEvent } from '@univerjs/engine-render';
 import {
     IRenderManagerService,
@@ -25,41 +25,43 @@ import {
     Slide,
     Viewport,
 } from '@univerjs/engine-render';
-import { Inject, Injector } from '@wendellhu/redi';
-
-import { Subject, takeUntil } from 'rxjs';
-import { ObjectProvider } from './object-provider';
+import type { IDisposable } from '@wendellhu/redi';
+import { Inject } from '@wendellhu/redi';
+import { Subject } from 'rxjs';
+import { ObjectProviderService } from './object-provider.service';
 
 export enum SLIDE_KEY {
     COMPONENT = '__slideRender__',
     SCENE = '__mainScene__',
     VIEW = '__mainView__',
 }
-@OnLifecycle(LifecycleStages.Ready, CanvasView)
-export class CanvasView extends RxDisposable {
-    private _objectProvider: ObjectProvider | null = null;
 
+export class CanvasViewService extends Disposable implements IDisposable {
     private _activePageId: string = '';
     readonly activePageId$ = new Subject<string>();
 
     constructor(
         @IUniverInstanceService private readonly _univerInstanceService: IUniverInstanceService,
-        @Inject(Injector) private readonly _injector: Injector,
+        @Inject(ObjectProviderService) private readonly _objectProviderService: ObjectProviderService,
         @IRenderManagerService private readonly _renderManagerService: IRenderManagerService
     ) {
         super();
-        this._initializeDependencies(this._injector);
+
         this._initialize();
     }
 
     private _initialize() {
-        this._renderManagerService.createRender$.pipe(takeUntil(this.dispose$)).subscribe((unitId) => {
-            this._create(unitId);
-        });
+        this.disposeWithMe(
+            this._renderManagerService.createRender$.subscribe((unitId) => {
+                this._create(unitId);
+            })
+        );
 
-        this._univerInstanceService.getCurrentTypeOfUnit$<SlideDataModel>(UniverInstanceType.UNIVER_SLIDE).pipe(takeUntil(this.dispose$)).subscribe((slideModel) => {
-            this._create(slideModel?.getUnitId());
-        });
+        this.disposeWithMe(
+            this._univerInstanceService.getCurrentTypeOfUnit$<SlideDataModel>(UniverInstanceType.UNIVER_SLIDE).subscribe((slideModel) => {
+                this._create(slideModel?.getUnitId());
+            })
+        );
 
         this._univerInstanceService.getAllUnitsForType<SlideDataModel>(UniverInstanceType.UNIVER_SLIDE).forEach((slideModel) => {
             this._create(slideModel.getUnitId());
@@ -395,7 +397,7 @@ export class CanvasView extends RxDisposable {
     private _createScene(pageId: string, page: ISlidePage) {
         const render = this._currentRender();
 
-        if (!render || !this._objectProvider) {
+        if (!render || !this._objectProviderService) {
             return;
         }
 
@@ -424,7 +426,7 @@ export class CanvasView extends RxDisposable {
         const { pageElements, pageBackgroundFill } = page;
 
         // SceneViewers
-        const objects = this._objectProvider.convertToRenderObjects(pageElements, mainScene);
+        const objects = this._objectProviderService.convertToRenderObjects(pageElements, mainScene);
         if (!objects || !slide) return;
 
         this._addBackgroundRect(scene, pageBackgroundFill);
@@ -448,9 +450,5 @@ export class CanvasView extends RxDisposable {
         slide.addPage(scene);
 
         return scene;
-    }
-
-    private _initializeDependencies(slideInjector: Injector) {
-        this._objectProvider = slideInjector.createInstance(ObjectProvider);
     }
 }

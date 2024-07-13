@@ -15,7 +15,7 @@
  */
 
 import type { EventState, ICellData, IPageElement } from '@univerjs/core';
-import { IContextService, LocaleService, ObjectMatrix, PageElementType, Styles, Worksheet } from '@univerjs/core';
+import { Disposable, IContextService, LocaleService, ObjectMatrix, PageElementType, Styles, Worksheet } from '@univerjs/core';
 import type { IScrollObserverParam, IWheelEvent } from '@univerjs/engine-render';
 import {
     getColor,
@@ -29,10 +29,8 @@ import {
     SpreadsheetSkeleton,
     Viewport,
 } from '@univerjs/engine-render';
-import type { Injector } from '@wendellhu/redi';
+import type { IDisposable } from '@wendellhu/redi';
 import { Inject } from '@wendellhu/redi';
-
-import { CanvasObjectProviderRegistry, ObjectAdaptor } from '../adaptor';
 
 enum SHEET_VIEW_KEY {
     MAIN = 'spreadInSlide',
@@ -47,10 +45,10 @@ enum SHEET_VIEW_KEY {
     VIEW_LEFT_TOP = 'spreadInSlideViewLeftTop',
 }
 
-export class SpreadsheetAdaptor extends ObjectAdaptor {
-    override zIndex = 4;
+export class SpreadsheetAdaptor extends Disposable implements IDisposable {
+    zIndex = 4;
 
-    override viewKey = PageElementType.SPREADSHEET;
+    viewKey = PageElementType.SPREADSHEET;
 
     constructor(
         @Inject(LocaleService) private readonly _localeService: LocaleService,
@@ -59,7 +57,7 @@ export class SpreadsheetAdaptor extends ObjectAdaptor {
         super();
     }
 
-    override check(type: PageElementType) {
+    check(type: PageElementType) {
         if (type !== this.viewKey) {
             return;
         }
@@ -67,7 +65,7 @@ export class SpreadsheetAdaptor extends ObjectAdaptor {
     }
 
     // eslint-disable-next-line max-lines-per-function
-    override convert(pageElement: IPageElement, mainScene: Scene) {
+    convert(pageElement: IPageElement, mainScene: Scene) {
         const {
             id,
             zIndex,
@@ -249,14 +247,3 @@ export class SpreadsheetAdaptor extends ObjectAdaptor {
         });
     }
 }
-
-export class SpreadsheetAdaptorFactory {
-    readonly zIndex = 4;
-
-    create(injector: Injector): SpreadsheetAdaptor {
-        const spreadsheetAdaptor = injector.createInstance(SpreadsheetAdaptor);
-        return spreadsheetAdaptor;
-    }
-}
-
-CanvasObjectProviderRegistry.add(new SpreadsheetAdaptorFactory());

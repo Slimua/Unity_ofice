@@ -147,6 +147,20 @@ export class FRange {
         return this._worksheet.getCell(this._range.startRow, this._range.startColumn)?.v ?? null;
     }
 
+    getValues(): CellValue[][] {
+        const values: CellValue[][] = [];
+        const { startRow, endRow, startColumn, endColumn } = this._range;
+        for (let row = startRow; row <= endRow; row++) {
+            const rowValues: CellValue[] = [];
+            for (let col = startColumn; col <= endColumn; col++) {
+                const cellValue = this._worksheet.getCell(row, col)?.v;
+                rowValues.push(cellValue ?? '');
+            }
+            values.push(rowValues);
+        }
+        return values;
+    }
+
     /**
      * Returns the formulas (A1 notation) for the cells in the range. Entries in the 2D array are empty strings for cells with no formula.
      * @returns A two-dimensional array of formulas in string format.

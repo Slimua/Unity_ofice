@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export { UniverSlidesPlugin } from './slides-plugin';
-export * from './views/render';
+export { UniverSlidesPlugin } from './plugin';
+export { CanvasViewService } from './services/canvas-view.service';

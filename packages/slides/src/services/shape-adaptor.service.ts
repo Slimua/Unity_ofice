@@ -15,25 +15,23 @@
  */
 
 import type { IPageElement } from '@univerjs/core';
-import { BasicShapes, getColorStyle, PageElementType } from '@univerjs/core';
+import { BasicShapes, Disposable, getColorStyle, PageElementType } from '@univerjs/core';
 import { Rect } from '@univerjs/engine-render';
-import type { Injector } from '@wendellhu/redi';
+import type { IDisposable } from '@wendellhu/redi';
 
-import { CanvasObjectProviderRegistry, ObjectAdaptor } from '../adaptor';
+export class ShapeAdaptor extends Disposable implements IDisposable {
+    zIndex = 2;
 
-export class ShapeAdaptor extends ObjectAdaptor {
-    override zIndex = 2;
+    viewKey = PageElementType.SHAPE;
 
-    override viewKey = PageElementType.SHAPE;
-
-    override check(type: PageElementType) {
+    check(type: PageElementType) {
         if (type !== this.viewKey) {
             return;
         }
         return this;
     }
 
-    override convert(pageElement: IPageElement) {
+    convert(pageElement: IPageElement) {
         const {
             id,
             zIndex,
@@ -109,14 +107,3 @@ export class ShapeAdaptor extends ObjectAdaptor {
         // }
     }
 }
-
-export class ShapeAdaptorFactory {
-    readonly zIndex = 2;
-
-    create(injector: Injector): ShapeAdaptor {
-        const shapeAdaptor = injector.createInstance(ShapeAdaptor);
-        return shapeAdaptor;
-    }
-}
-
-CanvasObjectProviderRegistry.add(new ShapeAdaptorFactory());

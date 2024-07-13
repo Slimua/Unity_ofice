@@ -14,23 +14,75 @@
  * limitations under the License.
  */
 
+/**
+ * Border style types
+ *
+ * @enum
+ */
 export enum BorderStyleTypes {
+    /**
+     * No border
+     */
     NONE,
+    /**
+     * Thin border
+     */
     THIN,
+    /**
+     * Hair border
+     */
     HAIR,
+    /**
+     * Dotted border
+     */
     DOTTED,
+    /**
+     * Dashed border
+     */
     DASHED,
+    /**
+     * Dash-dot border
+     */
     DASH_DOT,
+    /**
+     * Dash-dot-dot border
+     */
     DASH_DOT_DOT,
+    /**
+     * Double border
+     */
     DOUBLE,
+    /**
+     * Medium border
+     */
     MEDIUM,
+    /**
+     * Medium dashed border
+     */
     MEDIUM_DASHED,
+    /**
+     * Medium dash-dot border
+     */
     MEDIUM_DASH_DOT,
+    /**
+     * Medium dash-dot-dot border
+     */
     MEDIUM_DASH_DOT_DOT,
+    /**
+     * Slant dash-dot border
+     */
     SLANT_DASH_DOT,
+    /**
+     * Thick border
+     */
     THICK,
 }
 
+/**
+ * Border type
+ *
+ * @enum
+ */
 export enum BorderType {
     TOP = 'top',
     BOTTOM = 'bottom',

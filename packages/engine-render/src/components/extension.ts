@@ -77,3 +77,4 @@ export const SpreadsheetExtensionRegistry = Registry.create();
 export const SheetRowHeaderExtensionRegistry = Registry.create();
 export const SheetColumnHeaderExtensionRegistry = Registry.create();
 export const DocumentsSpanAndLineExtensionRegistry = Registry.create();
+export const SlideCanvasObjectProviderRegistry = Registry.create();

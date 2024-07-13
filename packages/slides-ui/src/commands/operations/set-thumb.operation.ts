@@ -16,15 +16,15 @@
 
 import type { IOperation } from '@univerjs/core';
 import { CommandType } from '@univerjs/core';
-import { CanvasView } from '@univerjs/slides';
+import { CanvasViewService } from '@univerjs/slides';
 import type { IAccessor } from '@wendellhu/redi';
 
 export const SetSlidePageThumbOperation: IOperation = {
     id: 'slide.operation.set-slide-page-thumb',
     type: CommandType.OPERATION,
     handler: (accessor: IAccessor) => {
-        const canvasView = accessor.get(CanvasView);
-        canvasView.createThumbs();
+        const canvasViewService = accessor.get(CanvasViewService);
+        canvasViewService.createThumbs();
         return true;
     },
 };

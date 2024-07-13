@@ -15,8 +15,8 @@
  */
 
 import type { EventState, IPageElement } from '@univerjs/core';
-import { DocumentDataModel, LocaleService, PageElementType } from '@univerjs/core';
-import type { BaseObject, IDocumentSkeletonDrawing, IPageRenderConfig, IWheelEvent } from '@univerjs/engine-render';
+import { Disposable, DocumentDataModel, LocaleService, PageElementType } from '@univerjs/core';
+import type { BaseObject, IDocumentSkeletonDrawing, IWheelEvent } from '@univerjs/engine-render';
 import {
     Documents,
     DocumentSkeleton,
@@ -24,16 +24,13 @@ import {
     Image,
     Liquid,
     PageLayoutType,
-    Rect,
     Scene,
     SceneViewer,
     ScrollBar,
     Viewport,
 } from '@univerjs/engine-render';
-import type { Injector } from '@wendellhu/redi';
+import type { IDisposable } from '@wendellhu/redi';
 import { Inject } from '@wendellhu/redi';
-
-import { CanvasObjectProviderRegistry, ObjectAdaptor } from '../adaptor';
 
 export enum DOCS_VIEW_KEY {
     MAIN = '__DocsRender__',
@@ -42,10 +39,10 @@ export enum DOCS_VIEW_KEY {
     VIEWPORT = '__DocsViewPort_',
 }
 
-export class DocsAdaptor extends ObjectAdaptor {
-    override zIndex = 5;
+export class DocumentAdaptor extends Disposable implements IDisposable {
+    zIndex = 5;
 
-    override viewKey = PageElementType.DOCUMENT;
+    viewKey = PageElementType.DOCUMENT;
 
     private _liquid = new Liquid();
 
@@ -53,7 +50,7 @@ export class DocsAdaptor extends ObjectAdaptor {
         super();
     }
 
-    override check(type: PageElementType) {
+    check(type: PageElementType) {
         if (type !== this.viewKey) {
             return;
         }
@@ -61,7 +58,7 @@ export class DocsAdaptor extends ObjectAdaptor {
     }
 
     // eslint-disable-next-line max-lines-per-function
-    override convert(pageElement: IPageElement, mainScene: Scene) {
+    convert(pageElement: IPageElement, mainScene: Scene) {
         const {
             id,
             zIndex,
@@ -162,21 +159,21 @@ export class DocsAdaptor extends ObjectAdaptor {
 
         const pageSize = documents.getSkeleton()?.getPageSize();
 
-        documents.pageRender$.subscribe((config: IPageRenderConfig) => {
-            const { page, pageLeft, pageTop, ctx } = config;
-            const { width, height, marginBottom, marginLeft, marginRight, marginTop } = page;
-            ctx.save();
-            ctx.translate(pageLeft - 0.5, pageTop - 0.5);
-            Rect.drawWith(ctx, {
-                width: pageSize?.width || width,
-                height: pageSize?.height || height,
-                strokeWidth: 1,
-                stroke: 'rgba(198,198,198, 1)',
-                fill: 'rgba(255,255,255, 1)',
-                zIndex: 3,
-            });
-            ctx.restore();
-        });
+        // documents.pageRender$.subscribe((config: IPageRenderConfig) => {
+        //     const { page, pageLeft, pageTop, ctx } = config;
+        //     const { width, height, marginBottom, marginLeft, marginRight, marginTop } = page;
+        //     ctx.save();
+        //     ctx.translate(pageLeft - 0.5, pageTop - 0.5);
+        //     Rect.drawWith(ctx, {
+        //         width: pageSize?.width || width,
+        //         height: pageSize?.height || height,
+        //         strokeWidth: 1,
+        //         stroke: 'rgba(198,198,198, 1)',
+        //         fill: 'rgba(255,255,255, 1)',
+        //         zIndex: 3,
+        //     });
+        //     ctx.restore();
+        // });
 
         const { left: docsLeft, top: docsTop } = documents;
 
@@ -359,14 +356,3 @@ export class DocsAdaptor extends ObjectAdaptor {
         return this;
     }
 }
-
-export class DocsAdaptorFactory {
-    readonly zIndex = 5;
-
-    create(injector: Injector): DocsAdaptor {
-        const docsAdaptor = injector.createInstance(DocsAdaptor);
-        return docsAdaptor;
-    }
-}
-
-CanvasObjectProviderRegistry.add(new DocsAdaptorFactory());

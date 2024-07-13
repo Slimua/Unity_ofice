@@ -23,7 +23,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDependency } from '@wendellhu/redi/react-bindings';
 import { useObservable } from '@univerjs/ui';
 import { IRenderManagerService } from '@univerjs/engine-render';
-import { CanvasView } from '@univerjs/slides';
+import { CanvasViewService } from '@univerjs/slides';
 import { ActivateSlidePageOperation } from '../../commands/operations/activate.operation';
 import { SetSlidePageThumbOperation } from '../../commands/operations/set-thumb.operation';
 import styles from './index.module.less';
@@ -36,7 +36,7 @@ export function SlideSideBar() {
     const univerInstanceService = useDependency(IUniverInstanceService);
     const commandService = useDependency(ICommandService);
     const renderManagerService = useDependency(IRenderManagerService);
-    const canvasView = useDependency(CanvasView);
+    const canvasViewService = useDependency(CanvasViewService);
 
     const slideBarRef = useRef<HTMLDivElement>(null);
     const currentSlide = useObservable(
@@ -59,10 +59,10 @@ export function SlideSideBar() {
 
     useEffect(() => {
         setDivRefs(slideList.map((_) => React.createRef()));
-    }, [slideList]);
+    }, [slideList.length]);
 
     useEffect(() => {
-        canvasView.activePageId$.subscribe((id) => {
+        canvasViewService.activePageId$.subscribe((id) => {
             setActivatePageId(id);
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps

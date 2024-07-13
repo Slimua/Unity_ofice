@@ -15,15 +15,13 @@
  */
 
 import type { IColorStyle, IPageElement, ISlidePage } from '@univerjs/core';
-import { getColorStyle, PageElementType, SlideDataModel } from '@univerjs/core';
+import { Disposable, getColorStyle, PageElementType, SlideDataModel } from '@univerjs/core';
 import type { Engine } from '@univerjs/engine-render';
 import { Rect, Scene, Slide, Viewport } from '@univerjs/engine-render';
+import type { IDisposable } from '@wendellhu/redi';
 import { Inject, Injector } from '@wendellhu/redi';
 
-import { CanvasObjectProviderRegistry, ObjectAdaptor } from '../adaptor';
-import { ObjectProvider } from '../object-provider';
-
-// import { DocsAdaptor, ImageAdaptor, RichTextAdaptor, ShapeAdaptor  } from './';
+import { ObjectProviderService } from './object-provider.service';
 
 export enum SLIDE_VIEW_KEY {
     MAIN = '__SLIDERender__',
@@ -32,25 +30,27 @@ export enum SLIDE_VIEW_KEY {
     VIEWPORT = '__SLIDEViewPort_',
 }
 
-export class SlideAdaptor extends ObjectAdaptor {
-    override zIndex = 6;
+export class SlideAdaptor extends Disposable implements IDisposable {
+    zIndex = 6;
 
-    override viewKey = PageElementType.SLIDE;
+    viewKey = PageElementType.SLIDE;
 
-    private _ObjectProvider: ObjectProvider | null = null;
+    private _objectProvider: ObjectProviderService | null = null;
 
-    constructor(@Inject(Injector) private _injector: Injector) {
+    constructor(
+        @Inject(Injector) private readonly _injector: Injector
+    ) {
         super();
     }
 
-    override check(type: PageElementType) {
+    check(type: PageElementType) {
         if (type !== this.viewKey) {
             return;
         }
         return this;
     }
 
-    override convert(pageElement: IPageElement, mainScene: Scene) {
+    convert(pageElement: IPageElement, mainScene: Scene) {
         const {
             id,
             zIndex,
@@ -103,7 +103,7 @@ export class SlideAdaptor extends ObjectAdaptor {
             return slideComponent;
         }
 
-        this._ObjectProvider = new ObjectProvider(this._injector);
+        this._objectProvider = new ObjectProviderService(this._injector);
 
         for (let i = 0, len = pageOrder.length; i < len; i++) {
             const page = pages[pageOrder[i]];
@@ -137,7 +137,7 @@ export class SlideAdaptor extends ObjectAdaptor {
 
         const { pageElements, pageBackgroundFill } = page;
 
-        const objects = this._ObjectProvider?.convertToRenderObjects(pageElements, mainScene);
+        const objects = this._objectProvider?.convertToRenderObjects(pageElements, mainScene);
 
         this._addBackgroundRect(scene, pageBackgroundFill, model);
 
@@ -169,14 +169,3 @@ export class SlideAdaptor extends ObjectAdaptor {
         scene.addObject(page, 0);
     }
 }
-
-export class SlideAdaptorFactory {
-    readonly zIndex = 6;
-
-    create(injector: Injector): SlideAdaptor {
-        const slideAdaptor = injector.createInstance(SlideAdaptor);
-        return slideAdaptor;
-    }
-}
-
-CanvasObjectProviderRegistry.add(new SlideAdaptorFactory());

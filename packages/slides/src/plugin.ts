@@ -15,12 +15,18 @@
  */
 
 import { Plugin, UniverInstanceType } from '@univerjs/core';
-import type { Engine } from '@univerjs/engine-render';
-import { IRenderingEngine } from '@univerjs/engine-render';
 import type { Dependency } from '@wendellhu/redi';
 import { Inject, Injector } from '@wendellhu/redi';
 
-import { CanvasView } from './views/render';
+import { CanvasViewService } from './services/canvas-view.service';
+import { ObjectProviderService } from './services/object-provider.service';
+import { RichTextAdaptor } from './services/rich-text-adaptor.service';
+import { SlideAdaptor } from './services/slide-adaptor.service';
+import { AdaptorController } from './controllers/adaptor.controller';
+import { ShapeAdaptor } from './services/shape-adaptor.service';
+import { ImageAdaptor } from './services/image-adaptor.service';
+import { DocumentAdaptor } from './services/document-adaptor.service';
+import { SpreadsheetAdaptor } from './services/spreadsheet-adaptor.service';
 
 export interface IUniverSlidesConfig {}
 
@@ -34,10 +40,6 @@ export class UniverSlidesPlugin extends Plugin {
 
     private _config: IUniverSlidesConfig;
 
-    private _canvasEngine: Engine | null = null;
-
-    private _canvasView: CanvasView | null = null;
-
     constructor(
         config: Partial<IUniverSlidesConfig> = {},
         @Inject(Injector) override readonly _injector: Injector
@@ -49,31 +51,30 @@ export class UniverSlidesPlugin extends Plugin {
     }
 
     initialize(): void {
-        this.initCanvasEngine();
     }
 
     getConfig() {
         return this._config;
     }
 
-    initCanvasEngine() {
-        this._canvasEngine = this._injector.get(IRenderingEngine);
-    }
-
     override onRendered(): void {
         this.initialize();
     }
 
-    getCanvasEngine() {
-        return this._canvasEngine;
-    }
-
-    getCanvasView() {
-        return this._canvasView;
-    }
-
     private _initializeDependencies(slideInjector: Injector) {
-        const dependencies: Dependency[] = [[CanvasView]];
+        const dependencies: Dependency[] = [
+            [CanvasViewService],
+            [ObjectProviderService],
+
+            [AdaptorController],
+
+            [RichTextAdaptor],
+            [ShapeAdaptor],
+            [ImageAdaptor],
+            [DocumentAdaptor],
+            [SpreadsheetAdaptor],
+            [SlideAdaptor],
+        ];
 
         dependencies.forEach((d) => {
             slideInjector.add(d);

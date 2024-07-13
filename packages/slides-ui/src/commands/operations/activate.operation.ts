@@ -16,7 +16,7 @@
 
 import type { IOperation } from '@univerjs/core';
 import { CommandType } from '@univerjs/core';
-import { CanvasView } from '@univerjs/slides';
+import { CanvasViewService } from '@univerjs/slides';
 import type { IAccessor } from '@wendellhu/redi';
 
 export interface IActiveSlidePageOperationParams {
@@ -26,8 +26,8 @@ export const ActivateSlidePageOperation: IOperation<IActiveSlidePageOperationPar
     id: 'slide.operation.activate-slide',
     type: CommandType.OPERATION,
     handler: (accessor: IAccessor, params: IActiveSlidePageOperationParams) => {
-        const canvasView = accessor.get(CanvasView);
-        canvasView.activePage(params.id);
+        const canvasViewService = accessor.get(CanvasViewService);
+        canvasViewService.activePage(params.id);
         return true;
     },
 };
