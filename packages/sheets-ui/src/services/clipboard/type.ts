@@ -39,10 +39,10 @@ export interface IParsedCellValueByClipboard {
     rowSpan?: number;
     colSpan?: number;
     style?: string;
-    content?: string;
+    content?: string | number;
     richTextParma?: {
         p?: IDocumentData;
-        v?: string;
+        v?: string | number;
     };
 
 }

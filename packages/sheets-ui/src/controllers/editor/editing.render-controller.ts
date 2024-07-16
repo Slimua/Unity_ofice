@@ -845,6 +845,13 @@ export class EditingRenderController extends Disposable implements IRenderModule
             this._editorBridgeService.interceptor.getInterceptPoints().AFTER_CELL_EDIT_ASYNC
         )(Promise.resolve(cell), context);
 
+        const finalCellValue = finalCell?.p?.body?.dataStream.trim();
+
+        if (Tools.isStringNumber(finalCellValue) && finalCell) {
+            finalCell.p && delete finalCell.p;
+            finalCell.v = Number(finalCellValue);
+        }
+
         this._commandService.executeCommand(SetRangeValuesCommand.id, {
             subUnitId: sheetId,
             unitId,

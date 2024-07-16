@@ -29,7 +29,7 @@ import type {
 } from '../type';
 import { extractNodeStyle } from './parse-node-style';
 import type { IAfterProcessRule } from './paste-plugins/type';
-import parseToDom, { generateParagraphs } from './utils';
+import parseToDom, { generateParagraphs, processCellValue } from './utils';
 
 export interface IStyleRule {
     filter: string | string[] | ((node: HTMLElement) => boolean);
@@ -304,7 +304,7 @@ export class HtmlToUSMService {
             parsedCellMatrix.forValue((row, col, value) => {
                 let style = handleStringToStyle(undefined, value.style);
                 if (value?.richTextParma?.p?.body?.textRuns?.length) {
-                    const textLen = value?.richTextParma?.v?.length;
+                    const textLen = value?.richTextParma?.v?.toString().length;
                     for (let i = 0; i < value?.richTextParma?.p?.body?.textRuns?.length; i++) {
                         const textRunItem = value?.richTextParma?.p?.body?.textRuns[i];
                         if (textRunItem.st === 0 && textRunItem.ed === textLen) {
@@ -486,7 +486,7 @@ export class HtmlToUSMService {
             cellText = decodeHTMLEntities(cell.innerHTML.replace(/[\r\n]/g, ''));
         }
         return {
-            cellText,
+            cellText: processCellValue(cell as HTMLTableCellElement, cellText),
             cellRichStyle,
         };
     }
@@ -715,11 +715,11 @@ function setMergedCellStyle(
     cellMatrix: ObjectMatrix<IParsedCellValueByClipboard>,
     cellStyle: string,
     cellValue: {
-        content: string;
+        content: string | number;
         style: string;
         richTextParma: {
             p?: IDocumentData;
-            v: string;
+            v: string | number;
         };
         rowSpan?: number;
         colSpan?: number;
