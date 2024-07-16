@@ -175,7 +175,8 @@ export class CanvasViewService extends Disposable implements IDisposable {
         //     width: 2400,
         //     height: 1800,
         // });
-        scene.resize(2400, 1800);
+        // scene.resize(2400, 1800);
+        scene.resize(1400, 1800);
 
         const viewMain = new Viewport(SLIDE_KEY.VIEW, scene, {
             left: 0,

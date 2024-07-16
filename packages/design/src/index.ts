@@ -58,7 +58,7 @@ export { type ITooltipProps, Tooltip, resizeObserverCtor } from './components/to
 export { type ITreeNodeProps, type ITreeProps, Tree, TreeSelectionMode, mergeTreeSelected, findSubTreeFromPath, findNodePathFromTree, filterLeafNode } from './components/tree';
 export { Switch } from './components/switch';
 export { type ILocale } from './locale/interface';
-export { defaultTheme, greenTheme, themeInstance } from './themes';
+export { defaultTheme, greenTheme, redTheme, themeInstance } from './themes';
 export { DraggableList, type IDraggableListProps } from './components/draggable-list';
 export { Textarea, type ITextareaProps } from './components/textarea';
 export { Mentions, type IMentionsProps, Mention, type MentionProps } from './components/mentions';

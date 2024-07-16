@@ -84,4 +84,9 @@ export class SlideDataModel extends UnitModel<ISlideData, UniverInstanceType.UNI
             pageElements: {},
         };
     }
+
+    apply(snapshot: ISlideData) {
+        // this._snapshot = { ...this._snapshot, ...snapshot };
+        this._snapshot = snapshot;
+    }
 }

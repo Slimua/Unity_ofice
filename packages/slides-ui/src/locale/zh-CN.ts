@@ -15,9 +15,21 @@
  */
 
 const locale = {
-    toolbar: {
-        undo: '撤销',
-        redo: '重做',
+    'slides-ui': {
+        menu: {
+            shapes: '形状',
+        },
+        shapes: {
+            rectangle: '矩形',
+            'rounded-rectangle': '圆角矩形',
+        },
+        'shape-selector': {
+            shapes: {
+                rectangle: '矩形',
+                lines: '线条',
+                blockArrows: '箭头',
+            },
+        },
     },
 };
 

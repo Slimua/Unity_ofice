@@ -14,26 +14,31 @@
  * limitations under the License.
  */
 
-import { LocaleType, Univer, UniverInstanceType } from '@univerjs/core';
-import { greenTheme } from '@univerjs/design';
+import { LocaleType, LogLevel, Univer, UniverInstanceType } from '@univerjs/core';
+import { redTheme } from '@univerjs/design';
 import { UniverRenderEnginePlugin } from '@univerjs/engine-render';
 import { UniverSlidesPlugin } from '@univerjs/slides';
 import { UniverSlidesUIPlugin } from '@univerjs/slides-ui';
 import { UniverUIPlugin } from '@univerjs/ui';
 
 import { UniverFormulaEnginePlugin } from '@univerjs/engine-formula';
+import { UniverDebuggerPlugin } from '@univerjs/debugger';
+
+import { enUS, ruRU, viVN, zhCN, zhTW } from '../locales';
 import { DEFAULT_SLIDE_DATA } from '../data';
-import { enUS, ruRU, zhCN } from '../locales';
 
 // univer
 const univer = new Univer({
-    theme: greenTheme,
+    theme: redTheme,
     locale: LocaleType.ZH_CN,
     locales: {
         [LocaleType.ZH_CN]: zhCN,
         [LocaleType.EN_US]: enUS,
         [LocaleType.RU_RU]: ruRU,
+        [LocaleType.ZH_TW]: zhTW,
+        [LocaleType.VI_VN]: viVN,
     },
+    logLevel: LogLevel.VERBOSE,
 });
 
 // base-render
@@ -44,6 +49,8 @@ univer.registerPlugin(UniverUIPlugin, {
 });
 univer.registerPlugin(UniverSlidesPlugin);
 univer.registerPlugin(UniverSlidesUIPlugin);
+
+univer.registerPlugin(UniverDebuggerPlugin);
 
 univer.createUnit(UniverInstanceType.UNIVER_SLIDE, DEFAULT_SLIDE_DATA);
 

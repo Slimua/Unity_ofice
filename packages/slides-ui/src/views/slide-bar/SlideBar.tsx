@@ -48,6 +48,8 @@ export function SlideSideBar() {
     const pages = currentSlide?.getPages();
     const pageOrder = currentSlide?.getPageOrder();
 
+    console.log(currentSlide?.getPages());
+
     if (!pages || !pageOrder) {
         return null;
     }
