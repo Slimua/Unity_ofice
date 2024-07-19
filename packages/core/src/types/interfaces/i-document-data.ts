@@ -830,7 +830,6 @@ export interface ITableRow {
 export interface ITableCell {
     st: number; // startIndex
     ed: number; // endIndex
-    // content: IBlockElement[]; // content
     tableCellStyle: ITableCellStyle; // tableCellStyle
 }
 
