@@ -19,6 +19,7 @@ import { Tools } from '../shared';
 import { DEFAULT_SLIDE } from '../types/const';
 import type { ISlideData, ISlidePage } from '../types/interfaces';
 import { PageType } from '../types/interfaces';
+import type { ISlideDrawings } from '../types/interfaces/i-slide-data';
 
 export class SlideDataModel extends UnitModel<ISlideData, UniverInstanceType.UNIVER_SLIDE> {
     override type: UniverInstanceType.UNIVER_SLIDE = UniverInstanceType.UNIVER_SLIDE;
@@ -83,5 +84,18 @@ export class SlideDataModel extends UnitModel<ISlideData, UniverInstanceType.UNI
             },
             pageElements: {},
         };
+    }
+
+    resetDrawing(drawings: ISlideDrawings, drawingsOrder: string[]) {
+        this._snapshot.drawings = drawings;
+        this._snapshot.drawingsOrder = drawingsOrder;
+    }
+
+    getDrawings() {
+        return this._snapshot.drawings;
+    }
+
+    getDrawingsOrder() {
+        return this._snapshot.drawingsOrder;
     }
 }

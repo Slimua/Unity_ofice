@@ -20,7 +20,7 @@ import type { IDisposable } from '../../common/di';
 import { createIdentifier } from '../../common/di';
 import type { IWorkbookData } from '../../types/interfaces/i-workbook-data';
 
-type IBusinessName = 'SHEET' | 'DOC';
+type IBusinessName = 'SHEET' | 'DOC' | 'SLIDE';
 export type IResourceName = `${IBusinessName}_${string}_PLUGIN`;
 export interface IResourceHook<T = any> {
     pluginName: IResourceName;

@@ -318,6 +318,9 @@ importers:
       '@univerjs/slides':
         specifier: workspace:*
         version: link:../packages/slides
+      '@univerjs/slides-drawing':
+        specifier: workspace:*
+        version: link:../packages/slides-drawing
       '@univerjs/slides-ui':
         specifier: workspace:*
         version: link:../packages/slides-ui
@@ -771,15 +774,9 @@ importers:
       '@univerjs/core':
         specifier: workspace:*
         version: link:../core
-      '@univerjs/docs':
-        specifier: workspace:*
-        version: link:../docs
       '@univerjs/drawing':
         specifier: workspace:*
         version: link:../drawing
-      '@univerjs/engine-render':
-        specifier: workspace:*
-        version: link:../engine-render
       '@univerjs/shared':
         specifier: workspace:*
         version: link:../../common/shared
@@ -2393,6 +2390,31 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.1
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.3
+      vite:
+        specifier: ^5.3.4
+        version: 5.3.4(@types/node@20.14.11)(less@4.2.0)(sass@1.77.5)(terser@5.31.1)
+      vitest:
+        specifier: ^2.0.3
+        version: 2.0.3(@types/node@20.14.11)(happy-dom@13.3.8)(jsdom@24.1.0)(less@4.2.0)(sass@1.77.5)(terser@5.31.1)
+
+  packages/slides-drawing:
+    dependencies:
+      rxjs:
+        specifier: '>=7.0.0'
+        version: 7.8.1
+    devDependencies:
+      '@univerjs/core':
+        specifier: workspace:*
+        version: link:../core
+      '@univerjs/drawing':
+        specifier: workspace:*
+        version: link:../drawing
+      '@univerjs/shared':
+        specifier: workspace:*
+        version: link:../../common/shared
       typescript:
         specifier: ^5.5.3
         version: 5.5.3

@@ -18,7 +18,7 @@ import type { ISize } from '../../shared/shape';
 import type { IKeyType, Nullable } from '../../shared/types';
 import type { LocaleType, ThemeColorType } from '../enum';
 import type { ShapeType } from '../enum/prst-geom-type';
-import type { ICustomBlock, IDocumentData, ILists, ITransformState } from './i-document-data';
+import type { DrawingType, ICustomBlock, IDocumentData, ILists, IObjectPositionH, IObjectPositionV, ITransformState } from './i-document-data';
 import type { IExtraModelData } from './i-extra-model-data';
 import type { IImageProperties } from './i-image-properties';
 import type { IPlaceholder } from './i-placeholder';
@@ -34,11 +34,38 @@ export interface ISlideData extends IReferenceSource, IExtraModelData {
     body?: ISlidePageBody;
 }
 
+export interface ISlideDrawingPosition {
+    size: ISize;
+    positionH: IObjectPositionH;
+    positionV: IObjectPositionV;
+    angle: number;
+    // Union field properties can be only one of the following:
+    // shapeProperties?: IShapeProperties;
+    // chartProperties?: IChartProperties;
+    // imageProperties?: IImageProperties;
+}
+
+export interface ISlideDrawingBase {
+    unitId: string;
+    subUnitId: string;
+
+    slideTransform: ISlideDrawingPosition;
+
+    drawingId: string;
+    drawingType: DrawingType;
+}
+
+export interface ISlideDrawings {
+    [drawingId: string]: ISlideDrawingBase;
+}
+
 interface IReferenceSource {
     master?: { [id: string]: ISlidePage };
     handoutMaster?: { [id: string]: ISlidePage };
     notesMaster?: { [id: string]: ISlidePage };
     layouts?: { [id: string]: ISlidePage };
+    drawings?: ISlideDrawings;
+    drawingsOrder?: string[];
     lists?: ILists;
 }
 
