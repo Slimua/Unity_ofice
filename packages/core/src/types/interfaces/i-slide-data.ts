@@ -32,6 +32,7 @@ export interface ISlideData extends IReferenceSource, IExtraModelData {
     title: string;
     pageSize: ISize;
     body?: ISlidePageBody;
+    resources?: Array<{ id?: string; name: string; data: string }>;
 }
 
 export interface ISlideDrawingPosition {
