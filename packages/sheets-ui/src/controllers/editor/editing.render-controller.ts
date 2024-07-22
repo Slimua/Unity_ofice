@@ -835,8 +835,9 @@ export class EditingRenderController extends Disposable implements IRenderModule
             return;
         }
 
+        const CellRaw = worksheet.getCellRaw(row, column) || {};
         const cellData: Nullable<ICellData> = getCellDataByInput(
-            worksheet.getCellRaw(row, column) || {},
+            CellRaw,
             documentLayoutObject,
             this._lexerTreeBuilder,
             (model) => this._resourceLoaderService.saveDoc(model),
@@ -876,6 +877,13 @@ export class EditingRenderController extends Disposable implements IRenderModule
         const finalCell = await this._editorBridgeService.interceptor.fetchThroughInterceptors(
             this._editorBridgeService.interceptor.getInterceptPoints().AFTER_CELL_EDIT_ASYNC
         )(Promise.resolve(cell), context);
+
+        const finalCellValue = finalCell?.p?.body?.dataStream.trim();
+
+        if (Tools.isStringNumber(finalCellValue) && finalCell && CellRaw.t !== CellValueType.STRING) {
+            finalCell.p && delete finalCell.p;
+            finalCell.v = Number(finalCellValue);
+        }
 
         this._commandService.executeCommand(SetRangeValuesCommand.id, {
             subUnitId: sheetId,

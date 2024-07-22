@@ -94,3 +94,13 @@ export function generateParagraphs(dataStream: string, prevParagraph?: IParagrap
 
     return paragraphs;
 }
+
+export function processCellValue(cell: HTMLTableCellElement, v: string): string | number {
+    if (cell.align === 'right') {
+        const num = Number(v);
+        if (!Number.isNaN(num)) {
+            return num;
+        }
+    }
+    return v;
+}
