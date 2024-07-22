@@ -15,3 +15,4 @@
  */
 
 export { UniverUniUIPlugin } from './plugin';
+export { UniHomeApp } from './views/uni-home/App';

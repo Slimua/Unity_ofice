@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-export class DocFormulaInputController {
+import React from 'react';
+import { RecentFiles } from '../recent-files/RecentFiles';
 
-}
-
+export const Home: React.FC = () => {
+    return (
+        <div>
+            {/* This component is not used for the time being */}
+            {/* <RecentFiles /> */}
+            <RecentFiles />
+        </div>
+    );
+};

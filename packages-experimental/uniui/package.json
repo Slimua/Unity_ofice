@@ -67,10 +67,12 @@
         "clsx": ">=2.0.0",
         "react": "^16.9.0 || ^17.0.0 || ^18.0.0",
         "react-dom": "^16.9.0 || ^17.0.0 || ^18.0.0",
+        "react-router-dom": "~6.25.1",
         "rxjs": ">=7.0.0"
     },
     "dependencies": {
         "@univerjs/icons": "^0.1.65",
+        "@xyflow/react": "^12.0.3",
         "rc-util": "^5.43.0"
     },
     "devDependencies": {
@@ -85,6 +87,7 @@
         "less": "^4.2.0",
         "react": "18.3.1",
         "react-dom": "18.3.1",
+        "react-router-dom": "~6.25.1",
         "rxjs": "^7.8.1",
         "typescript": "^5.5.3",
         "vite": "^5.3.4",
