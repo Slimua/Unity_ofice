@@ -14,33 +14,35 @@
  * limitations under the License.
  */
 
-import type { ISlideData, SlideDataModel } from '@univerjs/core';
 import { Disposable, ICommandService, Inject, IResourceManagerService, IUniverInstanceService, LifecycleService, LifecycleStages, OnLifecycle, UniverInstanceType } from '@univerjs/core';
-import type { IDrawingMapItem, IDrawingMapItemData } from '@univerjs/drawing';
+import type { IDrawingSubunitMap } from '@univerjs/drawing';
 import { IDrawingManagerService } from '@univerjs/drawing';
 import { filter, first } from 'rxjs/operators';
-import { type ISlideDrawing, ISlideDrawingService } from '../services/slide-drawing.service';
+import type { ISlideDrawing } from '../services/slide-drawing.service';
+import { ISlideDrawingService } from '../services/slide-drawing.service';
+import { SetDrawingApplyMutation } from '../commands/mutations/set-drawing-apply.mutation';
 
-export const SLIDES_DRAWING_PLUGIN = 'SLIDE_DRAWING_PLUGIN';
-export interface ISlideDrawingModel { drawings?: ISlideData['drawings']; drawingsOrder?: ISlideData['drawingsOrder'] };
+export const SLIDE_DRAWING_PLUGIN = 'SLIDE_DRAWING_PLUGIN';
 
-@OnLifecycle(LifecycleStages.Starting, SlideDrawingLoadController)
-export class SlideDrawingLoadController extends Disposable {
+@OnLifecycle(LifecycleStages.Starting, SlidesDrawingLoadController)
+export class SlidesDrawingLoadController extends Disposable {
     constructor(
         @ICommandService private readonly _commandService: ICommandService
     ) {
         super();
+
+        this.disposeWithMe(this._commandService.registerCommand(SetDrawingApplyMutation));
     }
 }
 
-@OnLifecycle(LifecycleStages.Starting, SlideDrawingController)
-export class SlideDrawingController extends Disposable {
+@OnLifecycle(LifecycleStages.Starting, SlidesDrawingController)
+export class SlidesDrawingController extends Disposable {
     constructor(
         @ISlideDrawingService private readonly _slideDrawingService: ISlideDrawingService,
         @IDrawingManagerService private readonly _drawingManagerService: IDrawingManagerService,
         @IResourceManagerService private _resourceManagerService: IResourceManagerService,
-        @IUniverInstanceService private _univerInstanceService: IUniverInstanceService,
-        @Inject(LifecycleService) private _lifecycleService: LifecycleService
+        @Inject(LifecycleService) private _lifecycleService: LifecycleService,
+        @IUniverInstanceService private _univerInstanceService: IUniverInstanceService
     ) {
         super();
 
@@ -49,102 +51,53 @@ export class SlideDrawingController extends Disposable {
 
     private _init(): void {
         this._initSnapshot();
+
         this._drawingInitializeListener();
     }
 
     private _initSnapshot() {
         const toJson = (unitId: string) => {
             const map = this._slideDrawingService.getDrawingDataForUnit(unitId);
-            if (map?.[unitId]) {
-                return JSON.stringify(map?.[unitId]);
+            if (map) {
+                return JSON.stringify(map);
             }
             return '';
         };
-        const parseJson = (json: string): IDrawingMapItem<ISlideDrawing> => {
+        const parseJson = (json: string): IDrawingSubunitMap<ISlideDrawing> => {
             if (!json) {
-                return { data: {}, order: [] };
+                return {};
             }
             try {
                 return JSON.parse(json);
             } catch (err) {
-                return { data: {}, order: [] };
+                return {};
             }
         };
-
         this.disposeWithMe(
-            this._resourceManagerService.registerPluginResource<IDrawingMapItem<ISlideDrawing>>({
-                pluginName: SLIDES_DRAWING_PLUGIN,
-                businesses: [UniverInstanceType.UNIVER_DOC],
+            this._resourceManagerService.registerPluginResource<IDrawingSubunitMap<ISlideDrawing>>({
+                pluginName: SLIDE_DRAWING_PLUGIN,
+                businesses: [UniverInstanceType.UNIVER_SLIDE],
                 toJson: (unitId) => toJson(unitId),
                 parseJson: (json) => parseJson(json),
                 onUnLoad: (unitId) => {
-                    this._setDrawingDataForUnit(unitId, { data: {}, order: [] });
+                    this._slideDrawingService.removeDrawingDataForUnit(unitId);
+                    this._drawingManagerService.removeDrawingDataForUnit(unitId);
                 },
                 onLoad: (unitId, value) => {
-                    this._setDrawingDataForUnit(unitId, { data: value.data ?? {}, order: value.order ?? [] });
+                    console.log('onLoad slide', unitId, value);
+                    this._slideDrawingService.registerDrawingData(unitId, value);
                 },
             })
         );
     }
 
-    private _setDrawingDataForUnit(unitId: string, drawingMapItem: IDrawingMapItem<ISlideDrawing>) {
-        const slideDataModel = this._univerInstanceService.getUnit<SlideDataModel>(unitId);
-        if (slideDataModel == null) {
-            return;
-        }
-
-        slideDataModel.resetDrawing(drawingMapItem.data, drawingMapItem.order);
-        this._initDataLoader();
-    }
-
-    private _initDataLoader(): boolean {
-        const dataModel = this._univerInstanceService.getCurrentUnitForType<SlideDataModel>(UniverInstanceType.UNIVER_DOC);
-        if (!dataModel) {
-            return false;
-        }
-
-        const unitId = dataModel.getUnitId();
-        const subUnitId = unitId;
-
-        const drawingDataModels = dataModel.getDrawings();
-        const drawingOrderModel = dataModel.getDrawingsOrder();
-
-        if (!drawingDataModels || !drawingOrderModel) {
-            return false;
-        }
-
-        // TODO@wzhudev: should move to docs-drawing.
-
-        Object.keys(drawingDataModels).forEach((drawingId) => {
-            const drawingDataModel = drawingDataModels[drawingId];
-            // const docTransform = drawingDataModel.docTransform;
-            // const transform = docDrawingPositionToTransform(docTransform);
-
-            drawingDataModels[drawingId] = { ...drawingDataModel } as ISlideDrawing;
-        });
-
-        const subDrawings = {
-            [subUnitId]: {
-                unitId,
-                subUnitId,
-                data: drawingDataModels as IDrawingMapItemData<ISlideDrawing>,
-                order: drawingOrderModel,
-            },
-        };
-
-        this._slideDrawingService.registerDrawingData(unitId, subDrawings);
-        this._drawingManagerService.registerDrawingData(unitId, subDrawings);
-        return true;
-    }
-
     private _drawingInitializeListener() {
-        this._lifecycleService.lifecycle$.pipe(filter((stage) => stage === LifecycleStages.Rendered), first()).subscribe((stage) => {
-            const unitId = this._univerInstanceService.getCurrentUnitForType(UniverInstanceType.UNIVER_DOC)?.getUnitId();
+        this._lifecycleService.lifecycle$.pipe(filter((e) => e === LifecycleStages.Steady), first()).subscribe(() => {
+            const unitId = this._univerInstanceService.getCurrentUnitForType(UniverInstanceType.UNIVER_SLIDE)?.getUnitId();
             if (!unitId) {
                 return;
             }
             this._slideDrawingService.initializeNotification(unitId);
-            this._drawingManagerService.initializeNotification(unitId);
         });
     }
 }

@@ -23,6 +23,7 @@ import { IUniverInstanceService } from '../instance/instance.service';
 import { Disposable, toDisposable } from '../../shared/lifecycle';
 import { UniverInstanceType } from '../../common/unit';
 import type { DocumentDataModel } from '../../docs';
+import type { SlideDataModel } from '../../slides/slide-model';
 import type { IResourceLoaderService } from './type';
 
 export class ResourceLoaderService extends Disposable implements IResourceLoaderService {
@@ -40,7 +41,21 @@ export class ResourceLoaderService extends Disposable implements IResourceLoader
                 switch (business) {
                     case UniverInstanceType.UNRECOGNIZED:
                     case UniverInstanceType.UNIVER_UNKNOWN:
-                    case UniverInstanceType.UNIVER_SLIDE:
+                    case UniverInstanceType.UNIVER_SLIDE: {
+                        this._univerInstanceService.getAllUnitsForType<SlideDataModel>(UniverInstanceType.UNIVER_SLIDE).forEach((slide) => {
+                            const snapshotResource = slide.getSnapshot().resources || [];
+                            const plugin = snapshotResource.find((r) => r.name === hook.pluginName);
+                            if (plugin) {
+                                try {
+                                    const data = hook.parseJson(plugin.data);
+                                    hook.onLoad(slide.getUnitId(), data);
+                                } catch (err) {
+                                    console.error(`Load Slide{${slide.getUnitId()}} Resources{${hook.pluginName}} Data Error.`);
+                                }
+                            }
+                        });
+                        break;
+                    }
                     case UniverInstanceType.UNIVER_DOC: {
                         this._univerInstanceService.getAllUnitsForType<DocumentDataModel>(UniverInstanceType.UNIVER_DOC).forEach((doc) => {
                             const snapshotResource = doc.getSnapshot().resources || [];

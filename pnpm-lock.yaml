@@ -321,6 +321,9 @@ importers:
       '@univerjs/slides-drawing':
         specifier: workspace:*
         version: link:../packages/slides-drawing
+      '@univerjs/slides-drawing-ui':
+        specifier: workspace:*
+        version: link:../packages/slides-drawing-ui
       '@univerjs/slides-ui':
         specifier: workspace:*
         version: link:../packages/slides-ui
@@ -2412,6 +2415,67 @@ importers:
       '@univerjs/shared':
         specifier: workspace:*
         version: link:../../common/shared
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.3
+      vite:
+        specifier: ^5.3.4
+        version: 5.3.4(@types/node@20.14.11)(less@4.2.0)(sass@1.77.5)(terser@5.31.1)
+      vitest:
+        specifier: ^2.0.3
+        version: 2.0.3(@types/node@20.14.11)(happy-dom@13.3.8)(jsdom@24.1.0)(less@4.2.0)(sass@1.77.5)(terser@5.31.1)
+
+  packages/slides-drawing-ui:
+    dependencies:
+      '@univerjs/icons':
+        specifier: ^0.1.65
+        version: 0.1.65(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+    devDependencies:
+      '@univerjs/core':
+        specifier: workspace:*
+        version: link:../core
+      '@univerjs/design':
+        specifier: workspace:*
+        version: link:../design
+      '@univerjs/drawing':
+        specifier: workspace:*
+        version: link:../drawing
+      '@univerjs/drawing-ui':
+        specifier: workspace:*
+        version: link:../drawing-ui
+      '@univerjs/engine-render':
+        specifier: workspace:*
+        version: link:../engine-render
+      '@univerjs/shared':
+        specifier: workspace:*
+        version: link:../../common/shared
+      '@univerjs/sheets':
+        specifier: workspace:*
+        version: link:../sheets
+      '@univerjs/sheets-drawing':
+        specifier: workspace:*
+        version: link:../sheets-drawing
+      '@univerjs/sheets-ui':
+        specifier: workspace:*
+        version: link:../sheets-ui
+      '@univerjs/slides-drawing':
+        specifier: workspace:*
+        version: link:../slides-drawing
+      '@univerjs/ui':
+        specifier: workspace:*
+        version: link:../ui
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      less:
+        specifier: ^4.2.0
+        version: 4.2.0
+      react:
+        specifier: 18.3.1
+        version: 18.3.1
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.1
       typescript:
         specifier: ^5.5.3
         version: 5.5.3

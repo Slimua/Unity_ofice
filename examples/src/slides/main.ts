@@ -28,7 +28,7 @@ import { UniverSlidesUIPlugin } from '@univerjs/slides-ui';
 import { UniverDrawingUIPlugin } from '@univerjs/drawing-ui';
 import { UniverDrawingPlugin } from '@univerjs/drawing';
 import { UniverSlidesDrawingPlugin } from '@univerjs/slides-drawing';
-// import { UniverSlidesDrawingUIPlugin } from '@univerjs/slides-drawing-ui';
+import { UniverSlidesDrawingUIPlugin } from '@univerjs/slides-drawing-ui';
 
 import { DEFAULT_SLIDE_DATA } from '../data';
 import { enUS, ruRU, viVN, zhCN, zhTW } from '../locales';
@@ -60,7 +60,7 @@ univer.registerPlugin(UniverSlidesUIPlugin);
 univer.registerPlugin(UniverDrawingPlugin);
 univer.registerPlugin(UniverDrawingUIPlugin);
 univer.registerPlugin(UniverSlidesDrawingPlugin);
-// univer.registerPlugin(UniverSlidesDrawingUIPlugin);
+univer.registerPlugin(UniverSlidesDrawingUIPlugin);
 
 univer.createUnit(UniverInstanceType.UNIVER_SLIDE, DEFAULT_SLIDE_DATA);
 

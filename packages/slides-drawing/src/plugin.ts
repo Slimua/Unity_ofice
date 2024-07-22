@@ -16,15 +16,15 @@
 
 import { Inject, Injector, Plugin, UniverInstanceType } from '@univerjs/core';
 import type { Dependency } from '@univerjs/core';
-import { SlideDrawingController, SlideDrawingLoadController, SLIDES_DRAWING_PLUGIN } from './controllers/slide-drawing.controller';
+import { SLIDE_DRAWING_PLUGIN, SlidesDrawingController, SlidesDrawingLoadController } from './controllers/slide-drawing.controller';
 import { ISlideDrawingService, SlideDrawingService } from './services/slide-drawing.service';
 
 export class UniverSlidesDrawingPlugin extends Plugin {
-    static override pluginName = SLIDES_DRAWING_PLUGIN;
+    static override pluginName = SLIDE_DRAWING_PLUGIN;
     static override type = UniverInstanceType.UNIVER_SLIDE;
 
     constructor(
-        _config: undefined,
+        private readonly _config: unknown,
         @Inject(Injector) override _injector: Injector
     ) {
         super();
@@ -32,12 +32,9 @@ export class UniverSlidesDrawingPlugin extends Plugin {
 
     override onStarting(_injector: Injector): void {
         ([
-            [SlideDrawingLoadController],
-            [SlideDrawingController],
-            [SlideDrawingService],
+            [SlidesDrawingLoadController],
+            [SlidesDrawingController],
             [ISlideDrawingService, { useClass: SlideDrawingService }],
-        ] as Dependency[
-
-        ]).forEach((dependency) => _injector.add(dependency));
+        ] as Dependency[]).forEach((dependency) => _injector.add(dependency));
     }
 }

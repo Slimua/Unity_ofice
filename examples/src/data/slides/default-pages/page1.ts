@@ -26,22 +26,22 @@ export const DEFAULT_FIRST_PAGE = {
         rgb: 'rgb(255,255,255)',
     },
     pageElements: {
-        background1: {
-            id: 'background1',
-            zIndex: 0,
-            left: 0,
-            top: 0,
-            width: 960,
-            height: 540,
-            title: 'background',
-            description: '',
-            type: PageElementType.IMAGE,
-            image: {
-                imageProperties: {
-                    contentUrl: 'https://minio.cnbabylon.com/univer/slide/Picture1.jpg',
-                },
-            },
-        },
+        // background1: {
+        //     id: 'background1',
+        //     zIndex: 0,
+        //     left: 0,
+        //     top: 0,
+        //     width: 960,
+        //     height: 540,
+        //     title: 'background',
+        //     description: '',
+        //     type: PageElementType.IMAGE,
+        //     image: {
+        //         imageProperties: {
+        //             contentUrl: 'https://minio.cnbabylon.com/univer/slide/Picture1.jpg',
+        //         },
+        //     },
+        // },
         mask1: {
             id: 'mask1',
             zIndex: 1,
