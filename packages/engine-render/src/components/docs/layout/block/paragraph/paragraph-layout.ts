@@ -32,9 +32,9 @@ export function dealWidthParagraph(
     sectionBreakConfig: ISectionBreakConfig
 ): IDocumentSkeletonPage[] {
     clearFontCreateConfigCache();
+    const { content = '' } = paragraphNode;
 
     // Step 1: Text Shaping.
-    const { content = '' } = paragraphNode;
     const shapedTextList = shaping(
         ctx,
         content,
@@ -65,26 +65,3 @@ export function dealWidthParagraph(
     return allPages;
 }
 
-function _checkAndPush(pages: IDocumentSkeletonPage[], currentPages: IDocumentSkeletonPage[]) {
-    const curLast = pages.slice(-1)[0];
-    const newFirst = currentPages[0];
-    if (curLast === newFirst) {
-        if (currentPages.length === 1) {
-            return curLast;
-        }
-        currentPages.shift();
-    }
-
-    pages.push(...currentPages);
-
-    return pages.slice(-1)[0];
-}
-
-// function _getAllSkeDrawings(curPage: IDocumentSkeletonPage, pageWidth: number, skeletonResourceReference: ISkeletonResourceReference, paragraphAffectSkeDrawings: Map<string, IDocumentSkeletonDrawing>) {
-//     const { skeHeaders, skeFooters, skeListLevel } = skeletonResourceReference;
-//     const affectAllSkeDrawings = new Map([
-//         ...(skeHeaders?.get(curPage.headerId)?.get(pageWidth)?.skeDrawings || []),
-//         ...(skeFooters?.get(curPage.footerId)?.get(pageWidth)?.skeDrawings || []),
-//         ...paragraphAffectSkeDrawings,
-//     ]);
-// }

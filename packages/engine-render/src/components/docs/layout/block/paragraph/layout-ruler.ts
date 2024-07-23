@@ -15,7 +15,7 @@
  */
 
 import type { INumberUnit, Nullable } from '@univerjs/core';
-import { BooleanNumber, DataStreamTreeTokenType, GridType, ObjectRelativeFromV, PositionedObjectLayoutType, SpacingRule } from '@univerjs/core';
+import { BooleanNumber, DataStreamTreeTokenType, GridType, ObjectRelativeFromV, PositionedObjectLayoutType, SpacingRule, TableTextWrapType } from '@univerjs/core';
 import type {
     IDocumentSkeletonColumn,
     IDocumentSkeletonDivide,
@@ -23,6 +23,7 @@ import type {
     IDocumentSkeletonGlyph,
     IDocumentSkeletonLine,
     IDocumentSkeletonPage,
+    IDocumentSkeletonTable,
 } from '../../../../../basics/i-document-skeleton-cached';
 import { GlyphType, LineType } from '../../../../../basics/i-document-skeleton-cached';
 import type { IParagraphConfig, ISectionBreakConfig } from '../../../../../basics/interfaces';
@@ -436,6 +437,7 @@ function _lineOperator(
     const {
         paragraphStyle = {},
         paragraphAffectSkeDrawings,
+        skeTableInParagraph,
         skeHeaders,
         skeFooters,
         pDrawingAnchor,
@@ -528,6 +530,10 @@ function _lineOperator(
             .filter((drawing) => drawing.drawingOrigin.docTransform.positionV.relativeFrom !== ObjectRelativeFromV.LINE);
 
         __updateAndPositionDrawings(ctx, lineTop, lineHeight, column, targetDrawings, paragraphConfig.paragraphIndex, paragraphStart, pDrawingAnchor?.get(paragraphIndex)?.top);
+    }
+
+    if (skeTableInParagraph != null && skeTableInParagraph.size > 0) {
+        _updateAndPositionTable(lineTop, lastPage, skeTableInParagraph);
     }
 
     const newLineTop = calculateLineTopByDrawings(
@@ -635,6 +641,36 @@ function __updateAndPositionDrawings(
         column,
         drawings
     );
+}
+
+function _updateAndPositionTable(
+    lineTop: number,
+    page: IDocumentSkeletonPage,
+    skeTableInParagraph: Map<string, IDocumentSkeletonTable>
+) {
+    if (skeTableInParagraph.size === 0) {
+        return;
+    }
+
+    for (const [tableId, table] of skeTableInParagraph) {
+        const { tableSource } = table;
+
+        switch (tableSource.textWrap) {
+            case TableTextWrapType.NONE: {
+                table.top = lineTop;
+                break;
+            }
+            case TableTextWrapType.WRAP: {
+                // TODO: @JOCS, handle text wrap position.
+                break;
+            }
+            default: {
+                throw new Error(`Unsupported table text wrap type: ${tableSource.textWrap}`);
+            }
+        }
+
+        page.skeTables.set(tableId, table);
+    }
 }
 
 function _getCustomBlockIdsInLine(line: IDocumentSkeletonLine) {
